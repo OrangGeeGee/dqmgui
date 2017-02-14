@@ -1,6 +1,6 @@
 pipeline {
     agent {
-        label: 'dqmgui-ci-worker'
+        label 'dqmgui-ci-worker'
     }
 
     stages {
