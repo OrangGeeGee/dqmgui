@@ -4,8 +4,8 @@ pipeline {
     stages {
         stage('Build') {
             steps {
-                ls -al
-                ls -al /data/srv
+                sh "ls -al"
+                sh "ls -al /data/srv"
             }
         }
         stage('Test') {
