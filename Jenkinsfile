@@ -1,8 +1,10 @@
 node('dqmgui-ci-worker') {
     stage('Build') {
-        checkout scm
+        sh "id"
+        sh "pwd"
         sh "ls -al"
         sh "ls -al /data/srv"
+        checkout scm
     }
     stage('Test') {
         echo 'Testing..'
