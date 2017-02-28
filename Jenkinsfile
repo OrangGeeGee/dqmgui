@@ -1,7 +1,5 @@
 pipeline {
-    agent {
-        label 'dqmgui-ci-worker'
-    }
+    agent any
 
     stages {
         stage('Build') {
