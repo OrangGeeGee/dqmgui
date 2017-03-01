@@ -1,5 +1,4 @@
-//node('dqmgui-ci-worker') {
-node {
+node('dqmgui-ci-worker') {
     stage('Build') {
         sh "id"
         sh "pwd"
