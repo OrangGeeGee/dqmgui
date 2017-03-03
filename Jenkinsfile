@@ -5,7 +5,7 @@ node('dqmgui-ci-worker') {
         sh "ls -al"
         sh "ls -al /data/srv"
         checkout scm
-        wget https://rovere.web.cern.ch/rovere/test_index.tar.bz2
+        sh "wget https://rovere.web.cern.ch/rovere/test_index.tar.bz2"
     }
     stage('Test') {„
         echo 'Testing..'
