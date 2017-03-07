@@ -1,7 +1,11 @@
 node('dqmgui-ci-worker') {
     stage('Build') {
         checkout scm
-        sh "for s in /data/srv/current/*/*/*/*/*/etc/profile.d/init.sh; do . $s; done"
+        sh "id"
+        sh "pwd"
+        sh "ls -al"
+        sh "ls -al /data/srv"
+        sh 'for s in /data/srv/current/*/*/*/*/*/etc/profile.d/init.sh; do . $s; done'
         sh "monDistPatch -s DQM"
     }
     stage('Start') {
