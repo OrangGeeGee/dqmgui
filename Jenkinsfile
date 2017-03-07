@@ -1,6 +1,7 @@
 node('dqmgui-ci-worker') {
     stage('Build') {
         checkout scm
+        sh "env"
         sh "id"
         sh "pwd"
         sh "ls -al"
