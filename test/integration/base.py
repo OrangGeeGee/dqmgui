@@ -19,7 +19,8 @@ class UploadWatchTimeout(Exception):
 class BaseIntegrationTest(unittest.TestCase):
     def setUp(self):
         config = ConfigParser.ConfigParser()
-        config.read('config.cfg')
+        script_dir = os.path.dirname(os.path.realpath(__file__))
+        config.read(script_dir + '/config.cfg')
         self.base_url = config.get('dqm', 'base_url')
         self.upload_watch_interval = float(config.get('dqm', 'upload_watch_interval'))
         self.upload_watch_retries = int(config.get('dqm', 'upload_watch_retries'))
