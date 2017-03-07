@@ -49,7 +49,7 @@ def TH1F(name):
     import ROOT as r
     bins = 200
     xmin = 0
-    xmax = 10
+    xmax = 11
     histo = r.TH1F(name, name, bins, xmin, xmax)
     histo.SetFillColor(45)
     for i in range(1, 10):
