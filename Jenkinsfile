@@ -6,10 +6,10 @@ node('dqmgui-ci-worker') {
         sh "ls -al"
         sh "ls -al /data/srv"
         sh 'for s in /data/srv/current/*/*/*/*/*/etc/profile.d/init.sh; do . $s; done'
+        sh "source /data/srv/current/apps/dqmgui/128/etc/profile.d/env.sh"
         sh "monDistPatch -s DQM"
     }
     stage('Start') {
-        sh "source /data/srv/current/apps/dqmgui/128/etc/profile.d/env.sh"
         sh '/data/srv/current/config/dqmgui/manage -f dev start "I did read documentation"'
     }
     stage('Test') {
