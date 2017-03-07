@@ -1,15 +1,20 @@
 node('dqmgui-ci-worker') {
     stage('Build') {
         checkout scm
-        sh "env"
-        sh "id"
-        sh "pwd"
-        sh "ls -al"
-        sh "ls -al /data/srv"
+        // environment debug
+        sh '''
+            id
+            pwd
+            env
+            ls -al
+            ls -al /data/srv
+        '''
+
+        //
         sh '''
             for s in /data/srv/current/*/*/*/*/*/etc/profile.d/init.sh; do . $s; done
             source /data/srv/current/apps/dqmgui/128/etc/profile.d/env.sh
-            monDistPatch -s DQM'
+            monDistPatch -s DQM
         '''
     }
     stage('Start') {
