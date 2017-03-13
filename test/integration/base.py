@@ -1,13 +1,14 @@
+import unittest
 import ConfigParser
 import hashlib
 import json
 import os
 import re
-import unittest
-from stat import ST_SIZE
-
 import requests
 import time
+import shutil
+import tempfile
+from stat import ST_SIZE
 
 import rootgen
 
@@ -24,17 +25,19 @@ class BaseIntegrationTest(unittest.TestCase):
         self.base_url = config.get('dqm', 'base_url')
         self.upload_watch_interval = float(config.get('dqm', 'upload_watch_interval'))
         self.upload_watch_retries = int(config.get('dqm', 'upload_watch_retries'))
+        self.temp_dir = tempfile.mkdtemp()
         print 'setUp'
 
     def tearDown(self):
+        shutil.rmtree(self.temp_dir)
         print 'tearDown'
 
-    def upload(self, filename):
+    def upload(self, filename, path):
 
         url = self.base_url + 'data/put'
-        files = {'file': (filename, open(filename, 'rb'))}
-        data = {'size': str(os.stat(filename)[ST_SIZE]),
-                'checksum': 'md5:%s' % hashlib.md5(file(filename).read()).hexdigest()}
+        files = {'file': (filename, open(path, 'rb'))}
+        data = {'size': str(os.stat(path)[ST_SIZE]),
+                'checksum': 'md5:%s' % hashlib.md5(file(path).read()).hexdigest()}
         headers = {'User-agent': 'Integration tests'}
         response = requests.post(url, data=data, files=files, headers=headers)
 
@@ -43,8 +46,8 @@ class BaseIntegrationTest(unittest.TestCase):
                  response.headers['DQM-Status-Detail'], response.content)
 
     def prepareIndex(self, content):
-        (filename, run, dataset) = rootgen.create_file(content)
-        self.upload(filename)
+        (filename, run, dataset, path) = rootgen.create_file(content, directory=self.temp_dir)
+        self.upload(filename, path)
         self.uploadWatch(dataset)
 
         return filename, run, dataset

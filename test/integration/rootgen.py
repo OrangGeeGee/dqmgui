@@ -14,24 +14,26 @@ def root_mkdir_p(folder):
             r.gDirectory.cd(fullpath)
 
 
-def gen_filename():
+def gen_filename(directory="."):
     version = 'V0001'
     run = 1
     runstr = 'R00000' + str(run)
     dataset = 'IntegTest'
     era = 'era' + datetime.datetime.utcnow().isoformat().replace(':', '').replace('.', '')
     datatier = 'DQM'
+    filename = 'DQM_%s_%s__%s__%s__%s.root' % (version, runstr, dataset, era, datatier)
     return (
-        'DQM_%s_%s__%s__%s__%s.root' % (version, runstr, dataset, era, datatier),
+        filename,
         run,
-        '/%s/%s/%s' % (dataset, era, datatier)
+        '/%s/%s/%s' % (dataset, era, datatier),
+        '%s/%s' % (directory, filename)
     )
 
 
-def create_file(content):
+def create_file(content, directory='.'):
     import ROOT as r
-    (filename, run, dataset) = gen_filename()
-    f = r.TFile(filename, 'RECREATE')
+    (filename, run, dataset, path) = gen_filename(directory)
+    f = r.TFile(path, 'RECREATE')
     generated = 0
     for (folder, histos) in content.items():
         root_mkdir_p(folder)
@@ -41,8 +43,8 @@ def create_file(content):
             h['gen'](h['name'])
     f.Write()
     f.Close()
-    print 'Created %s with %d histograms in %d folders' % (filename, generated, len(content))
-    return filename, run, dataset
+    print 'Created %s with %d histograms in %d folders' % (path, generated, len(content))
+    return filename, run, dataset, path
 
 
 def TH1F(name):
