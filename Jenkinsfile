@@ -5,12 +5,13 @@ node('dqmgui-ci-worker') {
         sh '''
             id
             pwd
+            python --version
             env
             ls -al
             ls -al /data/srv
         '''
 
-        //
+        // init environment variables and patch the version in the image with latest from repository
         sh '''
             for s in /data/srv/current/*/*/*/*/*/etc/profile.d/init.sh; do . $s; done
             source /data/srv/current/apps/dqmgui/128/etc/profile.d/env.sh
@@ -18,12 +19,13 @@ node('dqmgui-ci-worker') {
         '''
     }
     stage('Start') {
+        // start server in development mode
         sh '''
             source /data/srv/current/apps/dqmgui/128/etc/profile.d/env.sh
             /data/srv/current/config/dqmgui/manage -f dev start "I did read documentation"
         '''
     }
-    stage('Test') {
+    stage('Integration Test') {
         sh "python --version"
         sh "python -m unittest test/integration"
     }
