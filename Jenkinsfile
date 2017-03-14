@@ -26,8 +26,10 @@ node('dqmgui-ci-worker') {
         '''
     }
     stage('Integration Test') {
-        sh "python --version"
-        sh "python -m unittest test/integration"
+        sh '''
+            cd test/integration
+            python -m unittest discover
+        '''
     }
     stage('Index regression') {
         // TODO extract and validate new code works with old index
