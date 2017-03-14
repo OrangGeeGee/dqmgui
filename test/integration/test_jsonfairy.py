@@ -1,3 +1,6 @@
+import json
+import urllib2
+
 import requests
 
 import base
@@ -31,9 +34,9 @@ class JsonFairyTest(base.BaseIntegrationTest):
         print 'Starting verification...'
         histogram_url = '%sjsonfairy/archive/%d%s/Pixel/AdditionalPixelErrors/FedChNErr?formatted=false'\
                         % (self.base_url, run, dataset)
-        histogram_response = requests.get(histogram_url)
-        print 'Histogram fetched from %s with status %d' % (histogram_url, histogram_response.status_code)
-        self.assertTrue(histogram_response.ok,
-                        'Request failed. Status code received ' + str(histogram_response.status_code))
-        histogram_json = histogram_response.json()
+        histogram_response = urllib2.urlopen(histogram_url)
+        histogram_content = histogram_response.read()
+        print 'Histogram fetched from %s with status %d' % (histogram_url, histogram_response.getcode())
+        self.assertEquals(histogram_response.getcode(), 200, 'Request failed. Status code re1ceived not 200')
+        histogram_json = json.loads(histogram_content)
         print str(histogram_json)
