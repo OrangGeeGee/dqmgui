@@ -26,7 +26,9 @@ node('dqmgui-ci-worker') {
         '''
     }
     stage('Integration Test') {
+        // integration tests use visDQMUpload script or requests library, so we setup DQM env variables before running
         sh '''
+            source /data/srv/current/apps/dqmgui/128/etc/profile.d/env.sh
             cd test/integration
             python -m unittest discover
         '''
