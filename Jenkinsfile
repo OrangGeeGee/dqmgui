@@ -26,7 +26,7 @@ node('dqmgui-ci-worker') {
             ps aux | grep dqm
             sleep 10
             ps aux | grep dqm
-            for i in /data/srv/logs/dqmgui/dev/; do echo $i:; cat $i; done
+            for i in /data/srv/logs/dqmgui/dev/*; do echo $i:; cat $i; done
         '''
     }
     stage('Integration Test') {
