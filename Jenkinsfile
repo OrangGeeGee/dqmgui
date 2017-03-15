@@ -18,19 +18,11 @@ node('dqmgui-ci-worker') {
             monDistPatch -s DQM
         '''
     }
-    stage('Start') {
-        // start server in development mode
+    stage('Integration Test') {
+        // start server in development mode and run integration tests
         sh '''
             source /data/srv/current/apps/dqmgui/128/etc/profile.d/env.sh
             /data/srv/current/config/dqmgui/manage -f dev start "I did read documentation"
-            ps aux | grep dqm
-        '''
-    }
-    stage('Integration Test') {
-        // integration tests use visDQMUpload script or requests library, so we setup DQM env variables before running
-        sh '''
-            ps aux | grep dqm
-            source /data/srv/current/apps/dqmgui/128/etc/profile.d/env.sh
             cd test/integration
             python -m unittest discover
         '''
