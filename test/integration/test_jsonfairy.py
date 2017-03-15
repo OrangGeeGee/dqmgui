@@ -1,8 +1,5 @@
 import json
 import urllib2
-
-import requests
-
 import base
 import rootgen
 
