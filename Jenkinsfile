@@ -19,13 +19,14 @@ node('dqmgui-ci-worker') {
         '''
     }
     stage('Start') {
-        // start server in development mode, wait for it to start
+        // start server in development mode, wait for it to start and print logs
         sh '''
             source /data/srv/current/apps/dqmgui/128/etc/profile.d/env.sh
             /data/srv/current/config/dqmgui/manage -f dev start "I did read documentation"
             ps aux | grep dqm
             sleep 10
             ps aux | grep dqm
+            for i in /data/srv/logs/dqmgui/dev/; do echo $i:; cat $i; done
         '''
     }
     stage('Integration Test') {
