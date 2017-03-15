@@ -34,7 +34,7 @@ node('dqmgui-ci-worker') {
             ps aux | grep dqm
             source /data/srv/current/apps/dqmgui/128/etc/profile.d/env.sh
             cd test/integration
-            python -m unittest discover
+            python -m unittest discover -v
         '''
     }
     stage('Index regression') {
