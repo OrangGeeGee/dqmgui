@@ -1,5 +1,7 @@
 import datetime
 
+import math
+
 
 def root_mkdir_p(folder):
     import ROOT as r
@@ -49,10 +51,47 @@ def create_file(content, directory='.'):
 
 def TH1F(name):
     import ROOT as r
+    bins = 100
+    xmin = 0
+    xmax = 10
+    step = float(xmax - xmin) / bins + xmin
+
+    histo = r.TH1F(name, name, bins, xmin, xmax)
+    histo.SetFillColor(632)
+    for i in range(0, bins):
+        x = step * i
+        weight = math.sin(x)
+        histo.Fill(x, weight)
+        # histo.Fill(x, math.sin(x)*100)
+    histo.Write()
+
+
+def TH2F(name):
+    import ROOT as r
+    bins = 10
+    xmin = 0
+    xmax = 10
+    ymin = 0
+    ymax = 10
+    xstep = float(xmax - xmin) / bins
+    ystep = float(ymax - ymin) / bins
+    histo = r.TH2F(name, name, bins, xmin, xmax, bins, ymin, ymax)
+    histo.SetFillColor(45)
+    for i in range(bins):
+        for j in range(bins):
+            x = xmin + xstep * i
+            y = ymin + ystep * j
+            weight = math.sin(x) * math.cos(y) + 1
+            histo.Fill(x, y, weight)
+    histo.Write()
+
+
+def TProfile(name):
+    import ROOT as r
     bins = 200
     xmin = 0
     xmax = 11
-    histo = r.TH1F(name, name, bins, xmin, xmax)
+    histo = r.TProfile(name, name, bins, xmin, xmax)
     histo.SetFillColor(45)
     for i in range(1, 10):
         histo.Fill(i)
@@ -83,9 +122,9 @@ def scan_directory(path):
 
 if __name__ == '__main__':
     import argparse
+
     parser = argparse.ArgumentParser(description="Root file manipulation utils")
     parser.add_argument('filename', metavar='FILENAME', type=str,
                         help='Filename to read')
     args = parser.parse_args()
     read_contents(args.filename)
-

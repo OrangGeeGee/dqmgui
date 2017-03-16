@@ -9,8 +9,8 @@ class JsonFairyTest(base.BaseIntegrationTest):
         (filename, run, dataset) = self.prepareIndex({
             '/DQMData/Run 1/Pixel/Run summary/AdditionalPixelErrors': [
                 {'name': 'FedChNErr', 'gen': rootgen.TH1F},
-                {'name': 'FedChLErr', 'gen': rootgen.TH1F, 'type': 'TH2F'},
-                {'name': 'FedETypeNErr', 'gen': rootgen.TH1F, 'type': 'TH2F'},
+                {'name': 'FedChLErr', 'gen': rootgen.TH2F},
+                {'name': 'FedETypeNErr.json', 'gen': rootgen.TH2F},
             ],
             '/DQMData/Run 283560/Pixel/Run summary/AdditionalPixelErrors/FED_0': [
                 {'name': 'FedETypeNErr_siPixelDigis_0', 'gen': rootgen.TH1F},
