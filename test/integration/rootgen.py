@@ -88,13 +88,18 @@ def TH2F(name):
 
 def TProfile(name):
     import ROOT as r
-    bins = 200
+    bins = 100
     xmin = 0
-    xmax = 11
-    histo = r.TProfile(name, name, bins, xmin, xmax)
+    xmax = 10
+    ymin = -1
+    ymax = 1
+    xstep = float(xmax - xmin) / bins
+    histo = r.TProfile(name, name, bins, xmin, xmax, ymin, ymax)
     histo.SetFillColor(45)
-    for i in range(1, 10):
-        histo.Fill(i)
+    for i in range(bins):
+        x = xmin + xstep * i
+        y = math.sin(x)
+        histo.Fill(x, y)
     histo.Write()
 
 
