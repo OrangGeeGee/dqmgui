@@ -30,13 +30,21 @@ node('dqmgui-ci-worker') {
         '''
     }
     stage('Integration Test') {
-        // integration tests use visDQMUpload script or requests library, so we setup DQM env variables before running
-        sh '''
-            ps aux | grep dqm
-            source /data/srv/current/apps/dqmgui/128/etc/profile.d/env.sh
-            cd test/integration
-            python -m unittest discover -v
-        '''
+        try {
+            // integration tests use visDQMUpload script or requests library, so we setup DQM env variables before running
+            sh '''
+                ps aux | grep dqm
+                source /data/srv/current/apps/dqmgui/128/etc/profile.d/env.sh
+                cd test/integration
+                python -m unittest discover -v
+            '''
+        } finally {
+            // Application logs printed. Helpful in case of failures
+           sh '''
+           for i in /data/srv/logs/dqmgui/dev/*; do echo $i:; cat $i; done
+           '''
+        }
+
     }
     stage('Index regression') {
         // TODO extract and validate new code works with old index
