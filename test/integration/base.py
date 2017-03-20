@@ -119,4 +119,5 @@ class BaseIntegrationTest(unittest.TestCase):
                         return True
             i += 1
 
-        raise UploadWatchTimeout()
+        raise UploadWatchTimeout('Either server was too slow to index the file, or there was an error parsing it. '
+                                 'Check /data/srv/logs/dqmgui/dev/agent-import-128-*.log for details.')
