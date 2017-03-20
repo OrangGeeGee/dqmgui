@@ -28,10 +28,33 @@ import rootgen
 #
 # })
 class JsonFairyTest(base.BaseIntegrationTest):
-    def test_TH1F(self):
-        (self.filename, self.run, self.dataset) = self.prepareIndex({
-            '/DQMData/Run 1/Pixel/Run summary/AdditionalPixelErrors': [{'name': 'FedChNErr', 'gen': rootgen.TH1F}]})
+    
+    @classmethod
+    def setUpClass(cls):
+        super(JsonFairyTest, cls).setUpClass()
+        (cls.filename, cls.run_number, cls.dataset) = cls.prepareIndex({
+            '/DQMData/Run 1/Pixel/Run summary/AdditionalPixelErrors': [
+                {'name': 'FedChNErr', 'gen': rootgen.TH1F},
+                {'name': 'FedChLErr', 'gen': rootgen.TH2F},
+                {'name': 'FedETypeNErr', 'gen': rootgen.TH2F},
+            ],
+            '/DQMData/Run 283560/Pixel/Run summary/AdditionalPixelErrors/FED_0': [
+                {'name': 'FedETypeNErr_siPixelDigis_0', 'gen': rootgen.TH1F},
+            ],
+            '/DQMData/Run 1/Pixel/Run summary': [
+                {'name': 'averageDigiOccupancy', 'gen': rootgen.TProfile}],
+            '/DQMData/Run 1/Pixel/Run summary/Barrel': [
+                {'name': 'SUMOFF_charge_OnTrack_Barrel', 'gen': rootgen.TH1F},
+                {'name': 'SUMOFF_nclusters_OnTrack_Barrel', 'gen': rootgen.TH1F},
+                {'name': 'SUMOFF_size_OnTrack_Barrel', 'gen': rootgen.TH1F}],
+            '/DQMData/Run 1/Pixel/Run summary/Endcap': [
+                {'name': 'SUMOFF_charge_OnTrack_Endcap', 'gen': rootgen.TH1F},
+                {'name': 'SUMOFF_nclusters_OnTrack_Endcap', 'gen': rootgen.TH1F},
+                {'name': 'SUMOFF_size_OnTrack_Endcap', 'gen': rootgen.TH1F}]
 
+        })
+
+    def test_TH1F(self):
         response = self.fetch_histogram('Pixel/AdditionalPixelErrors/FedChNErr')
 
         self.assertEquals('TH1', response['hist']['type'])
@@ -50,9 +73,6 @@ class JsonFairyTest(base.BaseIntegrationTest):
         self.assertEquals(10, response['hist']['xaxis']['last']['value'])
 
     def test_TH2F(self):
-        (self.filename, self.run, self.dataset) = self.prepareIndex({
-            '/DQMData/Run 1/Pixel/Run summary/AdditionalPixelErrors': [{'name': 'FedChLErr', 'gen': rootgen.TH2F}]})
-
         response = self.fetch_histogram('Pixel/AdditionalPixelErrors/FedChLErr')
 
         self.assertEquals('TH2', response['hist']['type'])
@@ -77,9 +97,6 @@ class JsonFairyTest(base.BaseIntegrationTest):
         self.assertEquals(10, response['hist']['yaxis']['last']['value'])
 
     def test_TProfile(self):
-        (self.filename, self.run, self.dataset) = self.prepareIndex({
-            '/DQMData/Run 1/Pixel/Run summary': [{'name': 'averageDigiOccupancy', 'gen': rootgen.TProfile}]})
-
         response = self.fetch_histogram('Pixel/averageDigiOccupancy')
 
         self.assertEquals('TProfile', response['hist']['type'])
@@ -101,7 +118,7 @@ class JsonFairyTest(base.BaseIntegrationTest):
 
     def fetch_histogram(self, name):
         histogram_url = '%sjsonfairy/archive/%d%s/%s?formatted=false' \
-                        % (self.base_url, self.run, self.dataset, name)
+                        % (self.base_url, self.run_number, self.dataset, name)
         histogram_response = urllib2.urlopen(histogram_url)
         histogram_content = histogram_response.read()
         print 'Histogram fetched from %s with status %d' % (histogram_url, histogram_response.getcode())

@@ -20,37 +20,44 @@ class UploadWatchTimeout(Exception):
 
 
 class BaseIntegrationTest(unittest.TestCase):
-    def setUp(self):
+    
+    @classmethod
+    def setUpClass(cls):
+        super(BaseIntegrationTest, cls).setUpClass()
         config = ConfigParser.ConfigParser()
         script_dir = os.path.dirname(os.path.realpath(__file__))
         config.read(script_dir + '/config.cfg')
-        self.base_url = config.get('dqm', 'base_url')
-        self.upload_watch_interval = float(config.get('dqm', 'upload_watch_interval'))
-        self.upload_watch_retries = int(config.get('dqm', 'upload_watch_retries'))
-        self.temp_dir = tempfile.mkdtemp()
+        cls.base_url = config.get('dqm', 'base_url')
+        cls.upload_watch_interval = float(config.get('dqm', 'upload_watch_interval'))
+        cls.upload_watch_retries = int(config.get('dqm', 'upload_watch_retries'))
+        cls.temp_dir = tempfile.mkdtemp()
         print 'setUp'
 
-    def tearDown(self):
-        shutil.rmtree(self.temp_dir)
+    @classmethod
+    def tearDownClass(cls):
+        super(BaseIntegrationTest, cls).tearDownClass()
+        shutil.rmtree(cls.temp_dir)
         print 'tearDown'
 
-    def upload(self, filename, path):
+    @classmethod
+    def upload(cls, filename, path):
 
         try:
-            subprocess.check_call(["visDQMUpload", self.base_url, path])
+            subprocess.check_call(["visDQMUpload", cls.base_url, path])
         except (OSError, subprocess.CalledProcessError) as e:
             print 'visDQMUpload script invokation failed'
             print e
             try:
-                self.upload_requests(filename, path)
+                cls.upload_requests(filename, path)
             except ImportError as e:
                 print 'Either visDQMUpload must be available on path or requests library must be installed manually.'
                 raise e
 
-    def upload_requests(self, filename, path):
+    @classmethod
+    def upload_requests(cls, filename, path):
         import requests
 
-        url = self.base_url + 'data/put'
+        url = cls.base_url + 'data/put'
         files = {'file': (filename, open(path, 'rb'))}
         data = {'size': str(os.stat(path)[ST_SIZE]),
                 'checksum': 'md5:%s' % hashlib.md5(file(path).read()).hexdigest()}
@@ -61,41 +68,47 @@ class BaseIntegrationTest(unittest.TestCase):
               % (response.status_code, response.headers['DQM-Status-Code'], response.headers['DQM-Status-Message'],
                  response.headers['DQM-Status-Detail'], response.content)
 
-    def prepareIndex(self, content):
-        (filename, run, dataset, path) = rootgen.create_file(content, directory=self.temp_dir)
-        self.upload(filename, path)
-        self.uploadWatch(dataset)
+    @classmethod
+    def prepareIndex(cls, content):
+        (filename, run, dataset, path) = rootgen.create_file(content, directory=cls.temp_dir)
+        cls.upload(filename, path)
+        cls.uploadWatch(dataset)
 
         return filename, run, dataset
 
-    def session(self):
-        create_session_response = urllib2.urlopen(self.base_url)
+    @classmethod
+    def session(cls):
+        create_session_response = urllib2.urlopen(cls.base_url)
         create_session_content = create_session_response.read()
-        self.assertEquals(create_session_response.getcode(), 200, 'Request failed. Status code received not 200')
+        if create_session_response.getcode() != 200:
+            raise RuntimeError('Request failed. Status code re1ceived not 200')
 
         session = re.search('/dqm/dev/session/([\w\d]+)', create_session_content)
         return session.group(1)
 
-    def chooseSample(self, session):
-        choose_sample_url = '%ssession/%s/chooseSample?vary=run;order=dataset' % (self.base_url, session)
+    @classmethod
+    def chooseSample(cls, session):
+        choose_sample_url = '%ssession/%s/chooseSample?vary=run;order=dataset' % (cls.base_url, session)
         response = urllib2.urlopen(choose_sample_url)
         content = response.read()
-        self.assertEquals(response.getcode(), 200, 'Request failed. Status code re1ceived not 200')
+        if response.getcode() != 200:
+            raise RuntimeError('Request failed. Status code re1ceived not 200')
         content = re.sub('\)$', '', re.sub('^\(', '', content)).replace('\'', '"')
         json_content = json.loads(content)
         return json_content
 
-    def uploadWatch(self, dataset):
-        stdout.write('Upload watch started for dataset %s. Checking every %s seconds' % (dataset, self.upload_watch_interval))
+    @classmethod
+    def uploadWatch(cls, dataset):
+        stdout.write('Upload watch started for dataset %s. Checking every %s seconds' % (dataset, cls.upload_watch_interval))
         stdout.flush()
-        session = self.session()
+        session = cls.session()
         start_time = time.time()
         i = 0
-        while i < self.upload_watch_retries:
-            time.sleep(self.upload_watch_interval)
+        while i < cls.upload_watch_retries:
+            time.sleep(cls.upload_watch_interval)
             stdout.write('.')
             stdout.flush()
-            choose_sample_json = self.chooseSample(session)
+            choose_sample_json = cls.chooseSample(session)
             for types in choose_sample_json[1]['items']:
                 for item in types['items']:
                     if dataset == item['dataset']:
