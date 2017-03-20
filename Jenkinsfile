@@ -47,8 +47,13 @@ node('dqmgui-ci-worker') {
 
     }
     stage('Index regression') {
-        // TODO extract and validate new code works with old index
-        sh "wget https://rovere.web.cern.ch/rovere/test_index.tar.bz2"
-        // sh "for sample in {1..7}; do echo -n "$sample " && visDQMIndex dump --sample $sample test_index/ data 2>&1 >/dev/null | wc -l ; done"
+        // Extracts and validates new code works can index an older snapshot of index
+        sh '''
+            wget https://rovere.web.cern.ch/rovere/test_index.tar.bz2
+            tar xf test_index.tar.bz2
+            for sample in {1..7}; do
+                echo -n "$sample " && visDQMIndex dump --sample $sample test_index/ data 2>&1 >/dev/null | wc -l
+            done
+        '''
     }
 }
